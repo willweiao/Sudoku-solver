@@ -38,14 +38,15 @@ def solve_sudoku(board):
     """Solve the Sudoku puzzle using backtracking."""
     empty_cell = find_empty_cell(board)
     if not empty_cell:
-        return True  # Puzzle solved
+        return board  # Puzzle solved
 
     row, col = empty_cell
     for num in range(1, 10):  # Try numbers 1-9
         if is_valid(board, row, col, num):
             board[row][col] = num  # Place the number
-            if solve_sudoku(board):  # Recursive call
-                return True
+            result = solve_sudoku(board)
+            if result:
+                return result
             board[row][col] = None  # Backtrack
 
-    return False  # No solution found
+    return None  # No solution found
