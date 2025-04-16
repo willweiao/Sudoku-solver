@@ -83,33 +83,76 @@ def launch_ui():
                 status_label.config(text="❌ 有错误的确定数字，请检查红色格子")
                 return  # 不再继续检查候选数
             
-            # 检查用户填写的候选数是否包含错误项（和系统候选冲突）
+             # Step 2: 检查候选数是否合法
             system_candidates = get_candidates(grid)
             invalid = []
             hint_msgs = []
+            used_hint_cells = []
+
             for i in range(9):
                 for j in range(9):
                     if not candidates[i][j]:
                         continue
                     user_cand = set(map(int, candidates[i][j]))
-                    system_cand=system_candidates.get((i, j), set())
-                    if user_cand != system_cand:
+                    sys_cand = system_candidates.get((i, j), set())
+
+                    if not user_cand.issubset(sys_cand):
                         invalid.append((i, j))
                         entries[i][j].config(bg="#fdd")
-                        hint_msgs.append(f"格子({i+1},{j+1}) 的候选数应为: {sorted(system_cand)}")
+                        hint_msgs.append(f"格子({i+1},{j+1}) 的候选数应为: {sorted(sys_cand)}")
+                    else:
+                        used_hint_cells.append((i, j))
+
             if invalid:
                 status_label.config(text="⚠️ 有不合法候选数！\n" + "\n".join(hint_msgs))
                 return
             
-            hints = get_all_hints(grid)
-            if hints:
-                best_hint = hints[0]
-                status_label.config(text=f"🔍 技巧: {best_hint['technique']}\n原因: {best_hint['reason']}")
+            # Step 3: 过滤掉用户已使用的提示格子
+            all_hints = get_all_hints(grid)
+            filtered_hints = [
+                hint for hint in all_hints
+                if not any(pos in used_hint_cells for pos in hint.get("eliminate_from", []) + hint.get("optimize", []))
+            ]
+
+            # 提示优先级：先对用户填了候选数的格子进行提示
+            priority_0 = [
+                h for h in filtered_hints
+                if h["technique"] in ["Naked Single", "Hidden Single"]
+            ]
+
+            if priority_0:
+                best = priority_0[0]
+                i, j = best.get("position", (-1, -1))
+                status_label.config(
+                    text=f"✅ {best['technique']}: {best['reason']}"
+                )
+                if 0 <= i < 9 and 0 <= j < 9:
+                    entries[i][j].config(bg="#cce")
+                return
+            
+            priority_1 = [
+                hint for hint in filtered_hints
+                if any(pos in used_hint_cells for pos in hint.get("eliminate_from", []) + hint.get("optimize", []))
+            ]
+            
+            priority_2 = [
+                hint for hint in filtered_hints
+                if all(pos not in used_hint_cells for pos in hint.get("eliminate_from", []) + hint.get("optimize", []))
+            ]
+
+            ordered_hints = priority_1 + priority_2
+
+            if ordered_hints:
+                best_hint = ordered_hints[0]
+                status_label.config(
+                    text=f"🔍 技巧: {best_hint['technique']}\n📌 原因: {best_hint['reason']}"
+                )
                 for (i, j) in best_hint.get("eliminate_from", []) + best_hint.get("optimize", []):
                     entries[i][j].config(bg="#cce")
             else:
                 status_label.config(text="🟦 当前没有可用的逻辑提示")
-
+    
+    
     for i in range(9):
         for j in range(9):
             frame.grid_rowconfigure(i, minsize=48)
