@@ -168,8 +168,31 @@ def launch_ui():
                 entries[i][j] = entry
 
     tk.Button(root, text="💡 提示", command=show_hint).grid(row=1, column=0, pady=10)
+    
+    def reset_board():
+        global grid, candidates
+        for i in range(9):
+            for j in range(9):
+                entry = entries[i][j]
+                if entry is None:
+                    continue  # 跳过这个格子，防止报错
 
-    tk.Button(root, text="🆕 新题", command=lambda: [root.destroy(), launch_ui()]).grid(row=3, column=0, pady=5)
+                if puzzle[i][j] is not None:
+                    grid[i][j] = puzzle[i][j]
+                    candidates[i][j] = set()
+                    entry.config(state="normal")
+                    entries[i][j].delete(0, tk.END)
+                    entries[i][j].insert(0, str(puzzle[i][j]))
+                    entries[i][j].config(font=font_big, fg="black", justify="center", bg="white", state="disabled")
+                else:
+                    grid[i][j] = None
+                    candidates[i][j] = set()
+                    entries[i][j].config(state="normal")
+                    entries[i][j].delete(0, tk.END)
+                    entries[i][j].config(font=font_big, fg="black", justify="center", bg="white")
+        status_label.config(text="")  # 清空提示栏
+    
+    tk.Button(root, text="🔄 重置", command=reset_board).grid(row=3, column=0, pady=5)
 
     status_label = tk.Label(root, text="", font=("微软雅黑", 8), fg="blue", justify="left", anchor="w", wraplength=600)
     status_label.grid(row=11, column=0, columnspan=9, pady=5)
