@@ -8,7 +8,8 @@ from utils.helpers import is_grid_full
 from core.solver import solve_sudoku
 from core.logical_hints import get_candidates
 
-#puzzle = generate_puzzle(clues=30)
+puzzle = generate_puzzle(clues=30)
+"""
 puzzle=[
         [9, 1, None, None, None, 7, None, None, None],
         [None, 7, None, 1, None, 3, None, None, 8],
@@ -20,6 +21,7 @@ puzzle=[
         [None, None, None, None, None, 9, None, 6, None],
         [None, None, None, 8, None, None, None, None, 7],
     ]
+"""
 solution = solve_sudoku(deepcopy(puzzle))
 
 # ensure that the generated puzzle does have a solution
