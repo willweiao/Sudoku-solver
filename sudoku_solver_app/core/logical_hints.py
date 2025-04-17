@@ -46,6 +46,7 @@ def get_all_hints(table):
     # method that apply not on axis(s)
     all_hints += claiming_elimination_hint(candidates_dict)
     all_hints += xwing_hint(candidates_dict)
+    all_hints += xy_wing_hint(candidates_dict)
     all_hints += swordfish_hint(candidates_dict)
 
     return all_hints
@@ -527,6 +528,8 @@ def xy_wing_hint(candidates_dict):
             for peer in common_peers:
                 if peer in candidates_dict and z in candidates_dict[peer]:
                     eliminate.append(peer)
+            # 🚫 过滤掉自身
+            eliminate = [pos for pos in eliminate if pos not in {pivot, w1, w2}]
 
             if eliminate:
                 hints.append({
