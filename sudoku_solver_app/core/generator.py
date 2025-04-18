@@ -2,7 +2,7 @@ import random
 import copy
 from copy import deepcopy
 # from solver import solve_sudoku
-from logical_hints import get_all_hints
+from core.logical_hints import get_all_hints
 # from collections import Counter
 
 
