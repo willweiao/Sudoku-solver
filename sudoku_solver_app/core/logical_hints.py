@@ -13,12 +13,12 @@ def positions_human(pos_list):
 def get_all_hints(table):
     candidates_dict = get_candidates(table)
     
-    # 1️⃣ 先尝试 Naked Single（只有一个候选）
+    # 1️.先尝试 Naked Single（只有一个候选）
     naked_hints = naked_single_hint(candidates_dict)
     if naked_hints:
         return naked_hints
 
-    # 2️⃣ 再尝试 Hidden Single（某数字只能出现在一个格子）
+    # 2️.再尝试 Hidden Single（某数字只能出现在一个格子）
     hidden_hints = hidden_single_hint(candidates_dict)
     if hidden_hints:
         return hidden_hints
@@ -57,6 +57,7 @@ def if_valid(table, row, col, num):
     for i in range(9):
       if table[row][i]==num or table[i][col]==num:
          return False
+      
     # check if valid in the 3*3 square
     start_row, start_col = 3 * (row // 3), 3 * (col// 3)
     for i in range(3):
@@ -528,7 +529,7 @@ def xy_wing_hint(candidates_dict):
             for peer in common_peers:
                 if peer in candidates_dict and z in candidates_dict[peer]:
                     eliminate.append(peer)
-            # 🚫 过滤掉自身
+            # 过滤掉自身
             eliminate = [pos for pos in eliminate if pos not in {pivot, w1, w2}]
 
             if eliminate:
