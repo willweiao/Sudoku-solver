@@ -221,23 +221,18 @@ def really_generate_puzzle():
     candidates = [[set() for _ in range(9)] for _ in range(9)]
 
     update_grid(puzzle)
-    difficulty_display.config(text=f"Current Difficulty: {difficulty_var.get()}")
     status_label.config(text="Generating completed. Good luck!")
 
 # the main window
 def launch_ui():
     global root, entries, frame, difficulty_var, difficulty_display, status_label, grid, candidates
     root = tk.Tk()
-    root.title("数独解题辅助")
-    difficulty_var = tk.StringVar(value="Medium")  # default difficulty level
+    root.title("数独解题")
     
+    difficulty_var = tk.StringVar(value="Medium")   # default difficulty level=Medium
     # generate new puzzle of corresponding difficulty
     puzzle, solution, difficulty = generate_puzzle_by_level(difficulty_var.get())
-    
-    # difficulty level label
-    difficulty_display = tk.Label(root, text="Current Difficulty: Medium", font=("微软雅黑", 12, "bold"), fg="black")
-    difficulty_display.grid(row=0, column=0, columnspan=9, pady=5)
-    
+
     # update input grid and candidates 
     grid = [[puzzle[i][j] for j in range(9)] for i in range(9)]
     candidates = [[set() for _ in range(9)] for _ in range(9)]
@@ -265,14 +260,19 @@ def launch_ui():
             entry.bind("<KeyRelease>", lambda e, i=i, j=j: on_input(i, j))
             entries[i][j] = entry
     
-    # status section
-    status_label = tk.Label(root, text="", font=("微软雅黑", 8), fg="blue", justify="left", anchor="w", wraplength=600)
-    status_label.grid(row=11, column=0, columnspan=9, pady=5)
     
-    # button section
-    tk.Button(root, text="💡 提示", command=show_hint).grid(row=1, column=0, pady=10)
-    tk.Button(root, text="🔄 重置", command=reset_board).grid(row=3, column=0, pady=5)
-    tk.OptionMenu(root, difficulty_var, "Easy", "Medium", "Hard", "Extreme").grid(row=13, column=0, pady=5)
-    tk.Button(root, text="🆕 生成新题目", command=generate_new_puzzle).grid(row=4, column=0, pady=5)
+    # button frame
+    button_frame = tk.Frame(root)
+    button_frame.grid(row=1, column=0, pady=10)
+    
+    tk.Button(button_frame, text="💡 提示", command=show_hint, width=10).grid(row=0, column=0, pady=5)
+    tk.Button(button_frame, text="🔄 重置", command=reset_board, width=10).grid(row=0, column=1, pady=5)
+    tk.Button(button_frame, text="🆕 生成新题目", command=generate_new_puzzle, width=12).grid(row=0, column=2, pady=5)
+    # difficulty level choose
+    tk.OptionMenu(button_frame, difficulty_var, "Easy", "Medium", "Hard", "Extreme").grid(row=0, column=3, pady=5)
+    
+    # status label
+    status_label = tk.Label(root, text="", font=("微软雅黑", 8), fg="blue", justify="left", anchor="w", wraplength=600)
+    status_label.grid(row=2, column=0, pady=(5,10))
     
     root.mainloop()
