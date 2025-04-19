@@ -1,6 +1,8 @@
 import tkinter as tk
 import copy
+import json
 from copy import deepcopy
+import tkinter.messagebox as messagebox
 from core.generator import generate_puzzle_by_level
 from core.logical_hints import get_all_hints
 from core.checker import compare_with_solution
@@ -223,6 +225,42 @@ def really_generate_puzzle():
     update_grid(puzzle)
     status_label.config(text="Generating completed. Good luck!")
 
+# save and load function
+def save_progress(filename="sudoku_save.json"):
+    global puzzle, grid, candidates, difficulty_var
+    data = {
+        "puzzle": puzzle,
+        "grid": grid,
+        "candidates": [[list(cand) for cand in row] for row in candidates],
+        "difficulty": difficulty_var.get()
+    }
+    with open(filename, "w") as f:
+        json.dump(data, f)
+    messagebox.showinfo("保存成功", "✅ 当前进度已成功保存！")
+
+def load_progress(filename="sudoku_save.json"):
+    global puzzle, grid, candidates
+    
+    try:
+        with open(filename, "r") as f:
+            data = json.load(f)
+            puzzle = data["puzzle"]
+            grid = data["grid"]
+            candidates = [[set(cand) for cand in row] for row in data["candidates"]]
+            difficulty_var.set(data["difficulty"])
+            update_grid(puzzle)  # 恢复界面
+        
+        # 确保 entries 都已经创建完毕后再更新界面
+        if all(entries[i][j] for i in range(9) for j in range(9)):
+            update_grid(puzzle)
+        else:
+            messagebox.showerror("错误", "❗ 当前界面未初始化，无法加载存档！")
+
+        messagebox.showinfo("读取成功", "✅ 成功读取存档！")
+
+    except FileNotFoundError:
+        messagebox.showwarning("存档不存在", "⚠️ 没有找到存档文件，请先保存！")
+
 # the main window
 def launch_ui():
     global root, entries, frame, difficulty_var, difficulty_display, status_label, grid, candidates
@@ -260,10 +298,19 @@ def launch_ui():
             entry.bind("<KeyRelease>", lambda e, i=i, j=j: on_input(i, j))
             entries[i][j] = entry
     
+    # save&load frame
+    save_load_frame = tk.Frame(root)
+    save_load_frame.grid(row=1, column=0, pady=(5, 5))
+
+    save_button = tk.Button(save_load_frame, text="💾 保存进度", command=save_progress, width=12)
+    save_button.grid(row=0, column=0, padx=5)
+
+    load_button = tk.Button(save_load_frame, text="📂 读取存档", command=load_progress, width=12)
+    load_button.grid(row=0, column=1, padx=5)
     
     # button frame
     button_frame = tk.Frame(root)
-    button_frame.grid(row=1, column=0, pady=10)
+    button_frame.grid(row=2, column=0, pady=10)
     
     tk.Button(button_frame, text="💡 提示", command=show_hint, width=10).grid(row=0, column=0, pady=5)
     tk.Button(button_frame, text="🔄 重置", command=reset_board, width=10).grid(row=0, column=1, pady=5)
@@ -273,6 +320,6 @@ def launch_ui():
     
     # status label
     status_label = tk.Label(root, text="", font=("微软雅黑", 8), fg="blue", justify="left", anchor="w", wraplength=600)
-    status_label.grid(row=2, column=0, pady=(5,10))
+    status_label.grid(row=3, column=0, pady=(5,10))
     
     root.mainloop()
