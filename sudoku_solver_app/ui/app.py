@@ -89,7 +89,7 @@ def check_completion():
             if int(val) != solution[i][j]:
                 return  
     # 如果走到这里说明填满而且正确
-    tk.messagebox.showinfo("恭喜！", f"你完成了本题！\n用时：{elapsed_time // 60} 分 {elapsed_time % 60} 秒")
+    tk.messagebox.showinfo("Congratulations!", f"Sudoku completed successfully!\nTime：{elapsed_time // 60} min {elapsed_time % 60} sec")
 
     for i in range(9):
         for j in range(9):
@@ -134,11 +134,11 @@ def show_hint():
     if is_grid_full(grid):
         errors = compare_with_solution(grid, solution)
         if not errors:
-            status_label.config(text="🎉 恭喜你完成数独！")
+            status_label.config(text="🎉 Congratulations! Sudoku completed successfully!")
         else:
             for (i, j) in errors:
                 entries[i][j].config(bg=COLORS["error"])
-            status_label.config(text="❌ 有错误，请检查红色格子")
+            status_label.config(text="❌ Errors found, please check the highlighted cells.")
     else:
         # Step 1: 检查用户填写的确定数字是否正确
         wrong_digits = []
@@ -150,7 +150,7 @@ def show_hint():
                         entries[i][j].config(bg=COLORS["error"])
 
         if wrong_digits:
-            status_label.config(text="❌ 有错误的确定数字，请检查红色格子")
+            status_label.config(text="❌ Errors found, please check the highlighted cells.")
             return  # 不再继续检查候选数
             
         # Step 2: 检查候选数是否合法
@@ -169,12 +169,12 @@ def show_hint():
                 if not user_cand.issubset(sys_cand):
                     invalid.append((i, j))
                     entries[i][j].config(bg=COLORS["error"])
-                    hint_msgs.append(f"格子({i+1},{j+1}) 的候选数应为: {sorted(sys_cand)}")
+                    hint_msgs.append(f"Cell({i+1},{j+1}) candidates should be: {sorted(sys_cand)}")
                 else:
                     used_hint_cells.append((i, j))
 
         if invalid:
-            status_label.config(text="⚠️ 有不合法候选数！\n" + "\n".join(hint_msgs))
+            status_label.config(text="⚠️ Invalid candidates detected!\n" + "\n".join(hint_msgs))
             return
             
         # Step 3: 过滤掉用户已使用的提示格子
@@ -216,12 +216,12 @@ def show_hint():
         if ordered_hints:
             best_hint = ordered_hints[0]
             status_label.config(
-                text=f"🔍 技巧: {best_hint['technique']}\n📌 原因: {best_hint['reason']}"
+                text=f"🔍 Skill: {best_hint['technique']}\n📌 Reason: {best_hint['reason']}"
             )
             for (i, j) in best_hint.get("eliminate_from", []) + best_hint.get("optimize", []):
                 entries[i][j].config(bg=COLORS["hint"])
         else:
-            status_label.config(text="🟦 当前没有可用的逻辑提示")
+            status_label.config(text="🟦 No available logical hint currently. Please check advanced techniques:)")
 
 # update the grid according to the puzzle
 def update_grid(puzzle):
@@ -314,7 +314,7 @@ def save_progress(filename="sudoku_save.json"):
     }
     with open(filename, "w") as f:
         json.dump(data, f)
-    messagebox.showinfo("保存成功", "✅ 当前进度已成功保存！")
+    messagebox.showinfo("Saved", "✅ Your progress has been saved successfully!")
 
 def load_progress(filename="sudoku_save.json"):
     global puzzle, grid, candidates
@@ -336,12 +336,12 @@ def load_progress(filename="sudoku_save.json"):
         if all(entries[i][j] for i in range(9) for j in range(9)):
             update_grid(puzzle)
         else:
-            messagebox.showerror("错误", "❗ 当前界面未初始化，无法加载存档！")
+            messagebox.showerror("Error", "❗Current UI not initialized. Cannot load save!")
 
-        messagebox.showinfo("读取成功", "✅ 成功读取存档！")
+        messagebox.showinfo("Loaded", "✅ Successfully loaded saved progress!")
 
     except FileNotFoundError:
-        messagebox.showwarning("存档不存在", "⚠️ 没有找到存档文件，请先保存！")
+        messagebox.showwarning("Not found", "⚠️ No saved file found. Please save first!")
 
 # timer setup and pause scheme
 def start_timer():
@@ -427,19 +427,19 @@ def launch_ui():
     save_load_frame = tk.Frame(root)
     save_load_frame.grid(row=2, column=0, pady=(5, 5))
 
-    save_button = tk.Button(save_load_frame, text="💾 保存进度", command=save_progress, width=12)
+    save_button = tk.Button(save_load_frame, text="Save Progress", command=save_progress, width=12)
     save_button.grid(row=0, column=0, padx=5)
 
-    load_button = tk.Button(save_load_frame, text="📂 读取存档", command=load_progress, width=12)
+    load_button = tk.Button(save_load_frame, text="Load Progress", command=load_progress, width=12)
     load_button.grid(row=0, column=1, padx=5)
     
     # button frame
     button_frame = tk.Frame(root)
     button_frame.grid(row=3, column=0, pady=10)
     
-    tk.Button(button_frame, text="💡 提示", command=show_hint, width=10).grid(row=0, column=0, pady=5)
-    tk.Button(button_frame, text="🔄 重置", command=reset_board, width=10).grid(row=0, column=1, pady=5)
-    tk.Button(button_frame, text="🆕 生成新题目", command=generate_new_puzzle, width=12).grid(row=0, column=2, pady=5)
+    tk.Button(button_frame, text="Hint", command=show_hint, width=10).grid(row=0, column=0, pady=5)
+    tk.Button(button_frame, text="Reset", command=reset_board, width=10).grid(row=0, column=1, pady=5)
+    tk.Button(button_frame, text="New Puzzle", command=generate_new_puzzle, width=12).grid(row=0, column=2, pady=5)
     # difficulty level choose
     tk.OptionMenu(button_frame, difficulty_var, "Easy", "Medium", "Hard", "Extreme").grid(row=0, column=3, pady=5)
     
