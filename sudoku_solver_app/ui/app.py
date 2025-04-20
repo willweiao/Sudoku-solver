@@ -27,6 +27,15 @@ puzzle=[
 
 solution = solve_sudoku(deepcopy(puzzle))
 """
+# all the colors used
+COLORS = {
+    "background_white": "#ffffff",     # 普通格子
+    "background_gray": "#f0f0f0",      # 交错宫格背景
+    "highlight": "#ccf",               # 点击高亮行列宫格
+    "hint": "#d4edda",                 # 提示高亮
+    "error": "#fdd",                   # 错误格子
+    "hint_text_fg": "blue",            # 提示栏文字
+}
 
 # global font
 font_big = ("Helvetica", 18)
@@ -40,6 +49,8 @@ overlay_frame = None    # 暂停时的遮罩层
 
 # input grid function
 def on_input(i, j):
+    """click the grid and start input"""
+    highlight_related(i, j)
     val = entries[i][j].get()
     val = "".join(sorted(set(c for c in val if c in "123456789")))
     entries[i][j].delete(0, tk.END)
@@ -48,9 +59,9 @@ def on_input(i, j):
     block_row = i // 3
     block_col = j // 3
     if (block_row + block_col) % 2 == 0:
-        bg_color = "#ffffff"
+        bg_color = COLORS["background_white"]
     else:
-        bg_color = "#f0f0f0"
+        bg_color = COLORS["background_gray"]
 
     if len(val) == 1:
         grid[i][j] = int(val)
@@ -64,7 +75,60 @@ def on_input(i, j):
         grid[i][j] = None
         candidates[i][j] = set()
         entries[i][j].config(font=font_big, fg="black", justify="center", bg=bg_color)
-  
+    
+    check_completion()
+
+# check if complete the table
+def check_completion():
+    global is_paused
+    for i in range(9):
+        for j in range(9):
+            val = entries[i][j].get()
+            if not val.isdigit():
+                return  
+            if int(val) != solution[i][j]:
+                return  
+    # 如果走到这里说明填满而且正确
+    tk.messagebox.showinfo("恭喜！", f"你完成了本题！\n用时：{elapsed_time // 60} 分 {elapsed_time % 60} 秒")
+
+    for i in range(9):
+        for j in range(9):
+            entry = entries[i][j]
+            entry.config(state="disabled")
+
+    is_paused = True
+
+# on click highlight related grids
+def clear_highlight():
+    """clear highlight in all grids and only keep the background color for 3*3 square"""
+    for i in range(9):
+        for j in range(9):
+            entry = entries[i][j]
+            if entry:
+                block_row = i // 3
+                block_col = j // 3
+                if (block_row + block_col) % 2 == 0:
+                    bg_color = COLORS["background_white"]   # 白
+                else:
+                    bg_color = COLORS["background_gray"]  # 灰
+                entry.config(bg=bg_color)
+
+def highlight_related(i, j):
+    
+    clear_highlight()
+
+    # 再把相关格子染浅蓝色
+    for row in range(9):
+        entries[row][j].config(bg=COLORS["highlight"])  # 同列
+    for col in range(9):
+        entries[i][col].config(bg=COLORS["highlight"])  # 同行
+
+    # 同宫格
+    block_row, block_col = 3 * (i // 3), 3 * (j // 3)
+    for r in range(block_row, block_row + 3):
+        for c in range(block_col, block_col + 3):
+            entries[r][c].config(bg=COLORS["highlight"])
+ 
 # hint function
 def show_hint():
     if is_grid_full(grid):
@@ -73,7 +137,7 @@ def show_hint():
             status_label.config(text="🎉 恭喜你完成数独！")
         else:
             for (i, j) in errors:
-                entries[i][j].config(bg="#fdd")
+                entries[i][j].config(bg=COLORS["error"])
             status_label.config(text="❌ 有错误，请检查红色格子")
     else:
         # Step 1: 检查用户填写的确定数字是否正确
@@ -83,7 +147,7 @@ def show_hint():
                 if puzzle[i][j] is None and grid[i][j] is not None:
                     if grid[i][j] != solution[i][j]:
                         wrong_digits.append((i, j))
-                        entries[i][j].config(bg="#fdd")
+                        entries[i][j].config(bg=COLORS["error"])
 
         if wrong_digits:
             status_label.config(text="❌ 有错误的确定数字，请检查红色格子")
@@ -104,7 +168,7 @@ def show_hint():
 
                 if not user_cand.issubset(sys_cand):
                     invalid.append((i, j))
-                    entries[i][j].config(bg="#fdd")
+                    entries[i][j].config(bg=COLORS["error"])
                     hint_msgs.append(f"格子({i+1},{j+1}) 的候选数应为: {sorted(sys_cand)}")
                 else:
                     used_hint_cells.append((i, j))
@@ -120,7 +184,7 @@ def show_hint():
             if not any(pos in used_hint_cells for pos in hint.get("eliminate_from", []) + hint.get("optimize", []))
         ]
 
-        # 提示优先级：先对用户填了候选数的格子进行提示
+        # 提示优先级1：先检查是否可以使用naked siggle和hidden single方法（最简单的方法）
         priority_0 = [
             h for h in filtered_hints
             if h["technique"] in ["Naked Single", "Hidden Single"]
@@ -133,9 +197,10 @@ def show_hint():
                 text=f"✅ {best['technique']}: {best['reason']}"
             )
             if 0 <= i < 9 and 0 <= j < 9:
-                entries[i][j].config(bg="#cce")
+                entries[i][j].config(bg=COLORS["hint"])
             return
-            
+
+        # 提示优先级2：先对用户填了候选数的格子进行提示   
         priority_1 = [
             hint for hint in filtered_hints
             if any(pos in used_hint_cells for pos in hint.get("eliminate_from", []) + hint.get("optimize", []))
@@ -154,13 +219,35 @@ def show_hint():
                 text=f"🔍 技巧: {best_hint['technique']}\n📌 原因: {best_hint['reason']}"
             )
             for (i, j) in best_hint.get("eliminate_from", []) + best_hint.get("optimize", []):
-                entries[i][j].config(bg="#cce")
+                entries[i][j].config(bg=COLORS["hint"])
         else:
             status_label.config(text="🟦 当前没有可用的逻辑提示")
 
+# update the grid according to the puzzle
+def update_grid(puzzle):
+    """This function is used to clear the board for reset/regenerate/load progress,it clears all user input and highlight cauesd by click"""
+    for i in range(9):
+        for j in range(9):
+            entry = entries[i][j]
+            entry.config(state="normal")
+            entry.delete(0, tk.END)
+
+            block_row = i // 3
+            block_col = j // 3
+            if (block_row + block_col) % 2 == 0:
+                bg_color = COLORS["background_white"]
+            else:
+                bg_color = COLORS["background_gray"]
+
+            if puzzle[i][j] is not None:
+                entry.insert(0, str(puzzle[i][j]))
+                entry.config(state="disabled", disabledforeground="black", disabledbackground=bg_color, fg="black", bg=bg_color)
+            else:
+                entry.config(state="normal", fg="black", bg=bg_color)
+
 # reset function
 def reset_board():
-    global grid, candidates
+    global grid, candidates,is_paused
 
     for i in range(9):
         for j in range(9):
@@ -172,9 +259,9 @@ def reset_board():
             block_row = i // 3
             block_col = j // 3
             if (block_row + block_col) % 2 == 0:
-                bg_color = "#ffffff"
+                bg_color = COLORS["background_white"]
             else:
-                bg_color = "#f0f0f0"
+                bg_color = COLORS["background_gray"]
 
             if puzzle[i][j] is not None:
                 grid[i][j] = puzzle[i][j]
@@ -193,35 +280,13 @@ def reset_board():
     status_label.config(text="")  # 清空提示栏
     frame.update_idletasks()
 
-# update the grid according to the puzzle
-def update_grid(puzzle):
-    
-    for i in range(9):
-        for j in range(9):
-            entry = entries[i][j]
-            entry.config(state="normal")
-            entry.delete(0, tk.END)
-
-            block_row = i // 3
-            block_col = j // 3
-            if (block_row + block_col) % 2 == 0:
-                bg_color = "#ffffff"
-            else:
-                bg_color = "#f0f0f0"
-
-            if puzzle[i][j] is not None:
-                entry.insert(0, str(puzzle[i][j]))
-                entry.config(state="disabled", disabledforeground="black", disabledbackground=bg_color, fg="black", bg=bg_color)
-            else:
-                entry.config(state="normal", fg="black", bg=bg_color)
-
 # regenerate function
 def generate_new_puzzle():
     status_label.config(text="Generating new puzzle...Please wait")
     root.after(100, really_generate_puzzle)  # 100毫秒后真正生成
 
 def really_generate_puzzle():
-    global puzzle, solution, grid, candidates, elapsed_time
+    global puzzle, solution, grid, candidates, elapsed_time, is_paused
 
     puzzle, solution, _ = generate_puzzle_by_level(difficulty_var.get())
     grid = [[puzzle[i][j] for j in range(9)] for i in range(9)]
@@ -342,13 +407,14 @@ def launch_ui():
             block_row = i // 3
             block_col = j // 3
             if (block_row + block_col) % 2 == 0:
-                bg_color = "#ffffff"  # 白
+                bg_color = COLORS["background_white"]  
             else:
-                bg_color = "#f0f0f0"  # 淡灰色
+                bg_color = COLORS["background_gray"]  
 
             entry = tk.Entry(frame, font=font_big, width=2, justify='center', bd=1, relief='solid', fg="black", bg=bg_color)
             entry.grid(row=i, column=j, sticky="nsew")
             entry.bind("<KeyRelease>", lambda e, i=i, j=j: on_input(i, j))
+            entry.bind("<Button-1>", lambda e, i=i, j=j: highlight_related(i, j))
             entries[i][j] = entry
     
     # create a overlay frame for pause
