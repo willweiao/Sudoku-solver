@@ -3,7 +3,8 @@
 A complete Sudoku application with an interactive GUI, logical reasoning hints, puzzle generator, and full solution validation.
 
 <p align="center">
-  <img src="sudoku_solver_app\assets\main_window.png" width="600"/>
+  <img src="sudoku_solver_app\assets\icon.ico" width="150"/>
+  <img src="sudoku_solver_app\assets\main_window.png" width="300"/>
 </p>
 
 ---
