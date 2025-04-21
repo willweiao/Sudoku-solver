@@ -111,7 +111,12 @@ def clear_highlight():
                     bg_color = COLORS["background_white"]   # 白
                 else:
                     bg_color = COLORS["background_gray"]  # 灰
-                entry.config(bg=bg_color)
+                
+                if entry["state"] == "disabled":
+                    entry.config(disabledbackground=bg_color)
+                else:
+                    entry.config(bg=bg_color)
+
 
 def highlight_related(i, j):
     
@@ -119,15 +124,28 @@ def highlight_related(i, j):
 
     # 再把相关格子染浅蓝色
     for row in range(9):
-        entries[row][j].config(bg=COLORS["highlight"])  # 同列
+        entry = entries[row][j]
+        if entry["state"] == "disabled":
+            entry.config(disabledbackground=COLORS["highlight"])
+        else:
+            entry.config(bg=COLORS["highlight"])
+            
     for col in range(9):
-        entries[i][col].config(bg=COLORS["highlight"])  # 同行
+        entry = entries[i][col]
+        if entry["state"] == "disabled":
+            entry.config(disabledbackground=COLORS["highlight"])
+        else:
+            entry.config(bg=COLORS["highlight"])
 
     # 同宫格
     block_row, block_col = 3 * (i // 3), 3 * (j // 3)
     for r in range(block_row, block_row + 3):
         for c in range(block_col, block_col + 3):
-            entries[r][c].config(bg=COLORS["highlight"])
+            entry = entries[r][c]
+            if entry["state"] == "disabled":
+                entry.config(disabledbackground=COLORS["highlight"])
+            else:
+                entry.config(bg=COLORS["highlight"])
  
 # hint function
 def show_hint():
@@ -286,11 +304,12 @@ def generate_new_puzzle():
     overlay_label.config(text="Generating...")
     overlay_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
     overlay_frame.lift()
+    status_label.config(text="")
     root.after(100, really_generate_puzzle)  # 100毫秒后真正生成
 
 def really_generate_puzzle():
     global puzzle, solution, grid, candidates, elapsed_time, is_paused
-
+    
     puzzle, solution, _ = generate_puzzle_by_level(difficulty_var.get())
     grid = [[puzzle[i][j] for j in range(9)] for i in range(9)]
     candidates = [[set() for _ in range(9)] for _ in range(9)]
