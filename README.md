@@ -188,6 +188,8 @@ After building, the `.exe` will appear in the `/dist/` folder.
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+Please retain the original credits if you use or modify it.
+
 ---
 
 ## Acknowledgements
