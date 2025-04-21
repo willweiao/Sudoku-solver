@@ -113,7 +113,7 @@ python sudoku_solver_app/main.py
 - Save your current progress or load a previously saved puzzle.
 
 - Pause and resume your gameplay at any time.
-    - Sorry, it's pause time. Don't peak ;D
+    - Sorry, it's pause time. Don't peek ;D
 
 <p align="center">
   <img src="sudoku_solver_app\assets\enter_candidates.png" width="250"/>
