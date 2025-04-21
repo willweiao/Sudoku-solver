@@ -65,11 +65,6 @@ def evaluate_puzzle_difficulty(puzzle):
     if (score >= 80) or (num_holes >= 56 and len(simple_hints) <= 3):
         return "Extreme"
 
-    if not simple_hints:
-        return "Extreme"
-    
-    logic_score, max_tech_level = evaluate_logical_difficulty(hints)
-
     # 综合判定
     if num_holes <= 40 and max_tech_level <= 2:
         return "Easy"
