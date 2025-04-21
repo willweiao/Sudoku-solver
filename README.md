@@ -22,7 +22,6 @@ A complete Sudoku application with an interactive GUI, logical reasoning hints, 
 - [Logical Techniques Implemented](#logical-techniques-implemented)
 - [Project Structure](#project-structure)
 - [Build and Release](#build-and-release)
-- [Future Improvements](#future-improvements)
 - [License](#license)
 - [Acknowledgements](#acknowledgements)
 
