@@ -2,6 +2,10 @@
 
 A complete Sudoku application with an interactive GUI, logical reasoning hints, puzzle generator, and full solution validation.
 
+<p align="center">
+  <img src="sudoku_solver_app\assets\main_window.png" width="600"/>
+</p>
+
 ---
 
 ## Table of Contents
@@ -40,6 +44,11 @@ The project aims to simulate human logical solving strategies and provide an edu
 - **Difficulty Evaluation** based on solving logic complexity
 - **Packaged Executable (.exe)** available in Releases for easy download and play
 
+<p align="center">
+  <img src="sudoku_solver_app\assets\hint_highlight.png" width="250"/>
+  <img src="sudoku_solver_app\assets\error_highlight.png" width="250"/>
+  <img src="sudoku_solver_app\assets\save_progress.png"width="250"/>
+</p>
 ---
 
 ## Installation
@@ -83,14 +92,24 @@ python sudoku_solver_app/main.py
 - Start the application.
 
 - Select a difficulty level and generate a new puzzle.
+    - Extreme? huh sound not hard enough;
 
 - Fill in the grid by clicking on empty cells.
+    - enter only one number are seen as confirmed choice
+    - enter multiple numbers are counted as thinking of candidates
+    - you can change your answer any time you want! And Neither error count nor Hints limits!
 
 - Use the Hint button to receive logical solving suggestions.
 
 - Save your current progress or load a previously saved puzzle.
 
 - Pause and resume your gameplay at any time.
+    - Sorry, it's pause time. Don't peak ;D
+
+<p align="center">
+  <img src="sudoku_solver_app\assets\enter_candidates.png" width="250"/>
+  <img src="sudoku_solver_app\assets\generating.png" width="250"/>
+</p> 
 
 ---
 
@@ -149,20 +168,6 @@ python -m PyInstaller --onefile --noconsole --icon=sudoku_solver_app/assets/icon
 ```
 
 After building, the `.exe` will appear in the `/dist/` folder.
-
----
-
-## Future Improvements
-
-- Implement advanced solving techniques (e.g., Chains, Unique Rectangles)
-
-- Improve GUI design with modern themes
-
-- Add Sudoku puzzle import/export
-
-- Add a web-based or mobile app version
-
-- Develop a difficulty rating system based on actual solving steps
 
 ---
 
