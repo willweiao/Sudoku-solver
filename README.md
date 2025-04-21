@@ -54,6 +54,11 @@ The project aims to simulate human logical solving strategies and provide an edu
   <img src="sudoku_solver_app\assets\error_highlight.png" width="250"/>
   <img src="sudoku_solver_app\assets\save_progress.png"width="250"/>
 </p>
+
+<p align="center">
+  <sub> Hint highlight(green) (left) | Error highlight(red)(middle) | Save progress(right) </sub>
+</p>
+
 ---
 
 ## Installation
@@ -115,6 +120,10 @@ python sudoku_solver_app/main.py
   <img src="sudoku_solver_app\assets\enter_candidates.png" width="250"/>
   <img src="sudoku_solver_app\assets\generating.png" width="250"/>
 </p> 
+
+<p align="center">
+  <sub> Enter Candidates (left) | Generating new puzzle (right)</sub>
+</p>
 
 ---
 
