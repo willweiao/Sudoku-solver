@@ -76,6 +76,8 @@ Run the application:
 python sudoku_solver_app/main.py
 ```
 
+---
+
 ## Usage
 
 - Start the application.
@@ -90,6 +92,7 @@ python sudoku_solver_app/main.py
 
 - Pause and resume your gameplay at any time.
 
+---
 
 ## Logical Techniques Implemented
 
@@ -115,6 +118,8 @@ The real-time hint system is based on the following solving techniques:
 
 For more details, see the sudoku_tutorial/ folder for full logical techniques documentation.
 
+---
+
 ## Project Structure
 
 ```bash
@@ -131,6 +136,8 @@ README.md
 .gitignore
 ```
 
+---
+
 ## Build and Release
 
 The packaged executable "(`.exe`)"can be found in the Releases section.
@@ -143,6 +150,7 @@ python -m PyInstaller --onefile --noconsole --icon=sudoku_solver_app/assets/icon
 
 After building, the `.exe` will appear in the `/dist/` folder.
 
+---
 
 ## Future Improvements
 
@@ -156,11 +164,13 @@ After building, the `.exe` will appear in the `/dist/` folder.
 
 - Develop a difficulty rating system based on actual solving steps
 
+---
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
+---
 
 ## Acknowledgements
 
