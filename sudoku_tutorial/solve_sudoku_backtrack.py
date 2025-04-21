@@ -1,15 +1,3 @@
-"""
-This is the sudoku solver using back tracking method. The purpose of this file
-is solve the given sudoku puzzle and give the only correct answer. It's not 
-about the logical inference or any methods that we use in solving a sudoku 
-puzzle manually. The advantage of using it is its efficiency and correctness.
-Later on we will need this answer to check if the user made every position
-that already filled correctly. If so, then we can give a possible hint. If not,
-then we need to point out where it is wrongly considered, instead of giving a
-hint on the wrong step.
-"""
-
-
 def is_valid(board, row, col, num):
     """Check if placing 'num' at (row, col) follows Sudoku rules."""
     # Check row
