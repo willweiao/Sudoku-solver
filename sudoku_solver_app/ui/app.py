@@ -33,7 +33,7 @@ COLORS = {
     "background_gray": "#f0f0f0",      # 交错宫格背景
     "highlight": "#ccf",               # 点击高亮行列宫格
     "hint": "#d4edda",                 # 提示高亮
-    "error": "#fdd",                   # 错误格子
+    "error": "#fdd",                   # 错误格子高亮
     "hint_text_fg": "blue",            # 提示栏文字
 }
 
@@ -282,7 +282,10 @@ def reset_board():
 
 # regenerate function
 def generate_new_puzzle():
-    status_label.config(text="Generating new puzzle...Please wait")
+    global overlay_label
+    overlay_label.config(text="Generating...")
+    overlay_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
+    overlay_frame.lift()
     root.after(100, really_generate_puzzle)  # 100毫秒后真正生成
 
 def really_generate_puzzle():
@@ -299,7 +302,8 @@ def really_generate_puzzle():
     if is_paused:
         is_paused = False
         start_timer()  # 重新启动计时
-
+    
+    overlay_frame.place_forget()
     status_label.config(text="Generating completed. Good luck!")
 
 # save and load function
@@ -362,6 +366,7 @@ def toggle_pause():
     if not is_paused:
         # 进入暂停
         is_paused = True
+        overlay_label.config(text="Paused")
         overlay_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
         overlay_frame.lift()
     else:
@@ -371,9 +376,9 @@ def toggle_pause():
 
 # the main window
 def launch_ui():
-    global root, entries, frame, difficulty_var, status_label, grid, candidates, timer_label, overlay_frame
+    global root, entries, frame, difficulty_var, status_label, grid, candidates, timer_label, overlay_frame, overlay_label
     root = tk.Tk()
-    root.title("数独解题")
+    root.title("SUDOKU Champion")
     
     difficulty_var = tk.StringVar(value="Medium")   # default difficulty level=Medium
     # generate new puzzle of corresponding difficulty
@@ -417,13 +422,13 @@ def launch_ui():
             entry.bind("<Button-1>", lambda e, i=i, j=j: highlight_related(i, j))
             entries[i][j] = entry
     
-    # create a overlay frame for pause
+    # create a overlay frame for pause and generating new puzzle
     overlay_frame = tk.Frame(frame, bg="lightgray")
-    pause_text = tk.Label(overlay_frame, text="Paused", font=("微软雅黑", 24, "bold"), bg="lightgray")
-    pause_text.place(relx=0.5, rely=0.5, anchor="center")
+    overlay_label = tk.Label(overlay_frame, text="", font=("微软雅黑", 24, "bold"), bg="lightgray")
+    overlay_label.place(relx=0.5, rely=0.5, anchor="center")
     overlay_frame.place_forget()  # 默认隐藏
 
-    # save&load frame
+    # save & load frame
     save_load_frame = tk.Frame(root)
     save_load_frame.grid(row=2, column=0, pady=(5, 5))
 

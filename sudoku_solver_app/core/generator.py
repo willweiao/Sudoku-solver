@@ -35,8 +35,8 @@ TECHNIQUE_SCORES = {
 LEVEL_SETTINGS = {
     "Easy": (30, 40),
     "Medium": (40, 50),
-    "Hard": (50, 60),
-    "Extreme": (55, 60),
+    "Hard": (50, 56),
+    "Extreme": (56, 61),
 }
 
 
@@ -62,7 +62,7 @@ def evaluate_puzzle_difficulty(puzzle):
     simple_hints = [hint for hint in hints if hint.get("technique") in ("Naked Single", "Hidden Single")]
 
     # 特别判断Extreme ：分数非常高 或 50+空且简单hint极少
-    if (score >= 80) or (num_holes >= 50 and len(simple_hints) <= 3):
+    if (score >= 80) or (num_holes >= 56 and len(simple_hints) <= 3):
         return "Extreme"
 
     if not simple_hints:
