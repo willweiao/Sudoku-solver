@@ -116,7 +116,7 @@ def hidden_single_hint(candidates_dict):
     num_pos = defaultdict(list)
     for (r, c), cand in candidates_dict.items():
         for num in cand:
-            num_pos[(r, num)].append((r, c))
+            num_pos[(r, num, "row")].append((r, c))
             num_pos[(c, num, "col")].append((r, c))
             num_pos[((r//3, c//3), num, "box")].append((r, c))
 
